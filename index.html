@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <link rel="stylesheet/less" type="text/css" href="css/styles.less">
+    <!-- LESS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.5.1/less.min.js"></script>
+    <!-- Parse -->
+    <script src="//www.parsecdn.com/js/parse-1.6.4.min.js"></script>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.0/angular-route.js"></script>
+
+    <script src="js/utils.js"></script>
+
+    <script src="js/app.module.js"></script>
+    <script src="js/cities.controller.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+ <script>
+
+    Parse.initialize("DGkZSHEpZtVApIKR93DqTRCikd67koNglTu5pTUy", "hgMBdBCrqaHHIDgHqBhCUTS6McPnmJPnxbDI7wdX");
+        
+    function flip(){
+    var card = document.getElementById('card');
+  
+    card.toggleClassName('flipped');
+ }
+ </script>
+</head>
+
+<body ng-app="app">
+
+    <div class="my-panel">
+        <div class="row">
+            <div class="col-md-1 p-t p-l">
+                <img src="i/france1.png" class="logo">
+            </div>
+            <div class="col-md-4 p-t">
+                <p class="title"><a class="title" href="www.mesto.io">MESTO</a><span class="io">.io</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="my-search">
+                <p class="search-text">I want to go to</p>
+                <section class="container">
+                    <div id="card">
+                        <figure class="front">
+                            <div class="cities-box" ng-controller="CitiesController" ng-init="init()">
+                                <div class="row">
+                                    <div class="col-md-3 p-t p-sl" ng-repeat="city in cities">
+                                        <p class="city" ng-click="selectCity(city)">{{city.get("Name")}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </figure>
+                        <figure class="back">2</figure>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

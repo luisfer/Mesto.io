@@ -1,0 +1,149 @@
+
+@import "elements.less";
+
+@import url(https://fonts.googleapis.com/css?family=Quicksand:400,300);
+@import url(https://fonts.googleapis.com/css?family=Alegreya+Sans:400,400italic,500,500italic);
+
+@my-blue: #1e90ff;
+@almost-blue: #2ea0ff;
+@my-light-blue: #c1e2f7;
+@my-dark-blue: #222299;
+@white: #fdfdfd;
+@almost-white: #eeeeee;
+
+@padding-left: 50px;
+@padding-left-small: 20px;
+@padding-top: 20px;
+
+@logo-size: 50px;
+
+@city-size: 26px;
+@city-size-2: 30px;
+
+@title-size: 40px;
+@search-size: 50px;
+
+@panel-height: 65px;
+@search-height: 450px;
+
+@io-size: 24px;
+
+
+.my-panel {
+
+	background-color: @my-blue;
+	min-height: @panel-height;
+	width: 100%;
+	overflow-x: hidden;
+}
+
+.my-search {
+	.gradient(@almost-blue, @almost-blue, @my-blue);
+	background-color: @my-blue;
+	min-height: @search-height;
+	width: 100%;
+	overflow-x: hidden;
+}
+
+.logo {
+	width: @logo-size;
+}
+
+.p-l {
+	margin-left: @padding-left;
+}
+
+.p-sl {
+	margin-left: @padding-left-small;
+}
+
+.p-t {
+	margin-top: @padding-top;
+}
+
+p.title {
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @title-size;
+}
+
+p.search-text {
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @search-size;
+	text-align: center;
+
+}
+
+a.title {
+	&:extend(p.title);
+	text-decoration: none;
+
+	&:hover {
+		&:extend(p.title);
+		text-decoration: none;
+	}
+}
+
+div.cities-box {
+	text-align: center;
+	height: 200px;
+	background-color: @almost-white;
+	width: 60%;
+    margin: 0 auto;
+    .border-radius(10px, 10px, 10px, 10px);
+    .opacity(0.8);
+}
+
+span.io {
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @io-size;
+	font-style: italic;
+}
+
+p.city {
+	font-family: Alegreya Sans;
+	color: @my-dark-blue;
+	font-size: @city-size;
+	font-style: bold;
+	cursor: default;
+
+	&:hover {
+		font-size: @city-size-2;
+	}
+}
+
+.container { 
+  width: 200px;
+  height: 260px;
+  position: relative;
+  perspective: 800px;
+}
+
+#card {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 1s;
+}
+
+#card figure {
+  margin: 0;
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+#card .front {
+}
+#card .back {
+  transform: rotateY( 180deg );
+}
+
+#card.flipped {
+  transform: rotateY( 180deg );
+}

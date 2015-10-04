@@ -12,7 +12,13 @@ app.controller('CitiesController', ['$scope', function($scope) {
     $scope.listingIndex = -1;
     $scope.listingDivString = '<div class="col-sm-12 row-space-2 col-md-6">';
         
+    $scope.unformattedListings = [];
     $scope.listings = [];
+
+    $scope.pages = 0;
+
+    $scope.myParameters = {};
+
     $scope.init = function() {
 
         $scope.getCities();
@@ -24,20 +30,29 @@ app.controller('CitiesController', ['$scope', function($scope) {
         console.log($scope.selectedCity.get("Name"));
     }
 
-    $scope.doSearch = function() {
+    $scope.parameters = function(day1, day2, cityName, pageNumber){
+        this.day1 = day1;
+        this.day2 = day2;
+        this.cityName = cityName;
+        this.pageNumber = pageNumber;
+    }
 
-        console.log("HEllo");
+    $scope.doSearch = function() {
 
         var day1 = new moment();
         day1.add(1, 'days');
         
         var day2 = new moment();
         day2.add(8, 'days');
+    
+        $scope.myParameters = new $scope.parameters(day1, day2, $scope.selectedCity.get("Name"), 1);
         
-        console.log(day1);
-        console.log(day2);
+        $scope.connectToAirbnb($scope.myParameters);
+        
+    }
 
-        var myUrl = $scope.giveUrl(day1, day2, $scope.selectedCity.get("Name"));
+    $scope.connectToAirbnb = function(myParameters){
+        var myUrl = $scope.giveUrl($scope.myParameters);
         console.log(myUrl);
 
         $.ajaxPrefilter(function(options) {
@@ -51,21 +66,49 @@ app.controller('CitiesController', ['$scope', function($scope) {
         $.get(
             myUrl,
             function(response) {
-                console.log(response);
                 $scope.parseAirbnbCode(response);
         });
     }
 
-    $scope.parseAirbnbCode = function(doc){
+    $scope.parseAirbnbCode = function(doc, $q){
+        if ($scope.pages == 0){
+        var rentals = $scope.parseNumberRentals(doc);
+        
+        if (rentals == '300+'){
+            $scope.pages = 5;
+        } else {
+            var a = parseInt(rentals);
+            $scope.pages = Math.floor(a/18);
+        }
         $scope.parseListings(doc);
+        }
+        if ($scope.pages > 1){
+            $scope.myParameters.pageNumber++;
+            while ($scope.myParameters.pageNumber <= $scope.pages){
+                $scope.connectToAirbnb($scope.myParameters);
+                $scope.myParameters.pageNumber++;
+        }
+        }
     }
 
-    $scope.parseListings = function(doc){
+    $scope.parseNumberRentals = function(doc){
+        var resultsString = 'data-behavior="results_count_text">';
+        var a = doc.indexOf(resultsString);
+        var b = a + resultsString.length;
+        var index0 = $scope.giveNextIndex(a,doc,' Rentals');
+        var diff = index0 - b;
+        var rentals = doc.substr(b, diff);
+        return rentals;
+    }
+
+    $scope.parseListings = function(doc, $q){ 
+
+        var deferred = $q.defer();
+
         $scope.listingIndex = doc.indexOf('<div class="listings-container">');
         var myindex = 0;
         var i = 0;
         while(i < 18){
-            console.log(i);
             if (i == 0){
                 myindex = $scope.addListing($scope.listingIndex, $scope.listingDivString, doc);
                 
@@ -78,7 +121,9 @@ app.controller('CitiesController', ['$scope', function($scope) {
             }
             i++;  
         } 
-        console.log($scope.listings); 
+
+        console.log($scope.unformattedListings); 
+        return deferred.promise;
     }
 
     $scope.addListing = function(a, b, doc){
@@ -87,7 +132,7 @@ app.controller('CitiesController', ['$scope', function($scope) {
         var index1 = index0 + $scope.listingDivString.length;
         var index2 = $scope.giveNextIndex(index1,doc,b);
         var diff = index2 - index1;
-        $scope.listings.push(doc.substr(index1, diff));
+        $scope.unformattedListings.push(doc.substr(index1, diff));
         return index2;
     } 
 
@@ -97,11 +142,11 @@ app.controller('CitiesController', ['$scope', function($scope) {
     }
 
     // https://www.airbnb.com/s/London?checkin=10%2F25%2F2015&checkout=02%2F29%2F2016
-    $scope.giveUrl = function(cindate, coutdate, city) {
+    $scope.giveUrl = function(p) {
 
-        var checkindate = $scope.formatDate(cindate);
-        var checkoutdate = $scope.formatDate(coutdate);
-        myUrl = 'https://www.airbnb.com/s/' + city + '?checkin=' + checkindate + '&checkout=' + checkoutdate;
+        var checkindate = $scope.formatDate(p.day1);
+        var checkoutdate = $scope.formatDate(p.day2);
+        myUrl = 'https://www.airbnb.com/s/' + p.cityName + '?checkin=' + checkindate + '&checkout=' + checkoutdate + '&page=' + p.pageNumber;
         return myUrl;
     }
 

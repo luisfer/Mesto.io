@@ -17,10 +17,11 @@
 
 @logo-size: 50px;
 
-@city-size: 26px;
-@city-size-2: 30px;
+@city-size: 18px;
+@city-size-2: 24px;
 
 @title-size: 40px;
+@motto-size: 20px;
 @search-size: 50px;
 
 @panel-height: 65px;
@@ -67,7 +68,22 @@ p.title {
 	font-size: @title-size;
 }
 
+p.motto {
+	margin-top: -20px;
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @motto-size;
+}
+
 p.search-text {
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @search-size;
+	text-align: center;
+
+}
+
+p.go-button {
 	font-family: Quicksand;
 	color: @almost-white;
 	font-size: @search-size;
@@ -87,9 +103,9 @@ a.title {
 
 div.cities-box {
 	text-align: center;
-	height: 200px;
+	height: 300px;
 	background-color: @almost-white;
-	width: 60%;
+	width: 70%;
     margin: 0 auto;
     .border-radius(10px, 10px, 10px, 10px);
     .opacity(0.8);
@@ -103,12 +119,13 @@ span.io {
 }
 
 p.city {
-	font-family: Alegreya Sans;
+	font-family: Quicksand;
 	color: @my-dark-blue;
 	font-size: @city-size;
 	font-style: bold;
 	cursor: default;
-
+	text-align: center;
+	line-height: 1.0;
 	&:hover {
 		font-size: @city-size-2;
 	}

@@ -6,6 +6,10 @@
     <link rel="stylesheet/less" type="text/css" href="css/styles.less">
     <!-- LESS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.5.1/less.min.js"></script>
+
+    <!-- MOMENT.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    
     <!-- Parse -->
     <script src="//www.parsecdn.com/js/parse-1.6.4.min.js"></script>
 
@@ -48,30 +52,27 @@
             <div class="col-md-4 p-t">
                 <p class="title"><a class="title" href="www.mesto.io">MESTO</a><span class="io">.io</span>
                 </p>
+                <p class="motto">Find your bed <i>wisely</i>
+                </p>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="my-search">
+            <div class="my-search" ng-controller="CitiesController">
                 <p class="search-text">I want to go to</p>
-                <section class="container">
-                    <div id="card">
-                        <figure class="front">
-                            <div class="cities-box" ng-controller="CitiesController" ng-init="init()">
-                                <div class="row">
-                                    <div class="col-md-3 p-t p-sl" ng-repeat="city in cities">
-                                        <p class="city" ng-click="selectCity(city)">{{city.get("Name")}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </figure>
-                        <figure class="back">2</figure>
+                <div class="cities-box"  ng-init="init()">
+                    <div class="row">
+                        <div class="col-md-3 p-t p-sl" >
+                            <div ng-repeat="city in cities">
+                            <p class="city" ng-click="selectCity(city)">{{city.get("Name")}}</p>
+                        </div>
                     </div>
-                </section>
-
+                </div>
             </div>
+                <p class="go-button" ng-click="doSearch()">Find me a bed</p>
         </div>
+        <div id="viewer"></div>
     </div>
 </body>
 

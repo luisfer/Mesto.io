@@ -14,11 +14,14 @@
 @padding-left: 50px;
 @padding-left-small: 20px;
 @padding-top: 20px;
+@padding-right: 20px;
 
 @logo-size: 50px;
 
 @city-size: 18px;
 @city-size-2: 24px;
+@city-size-small: 13px;
+@selected-city-size: 48px;
 
 @title-size: 40px;
 @motto-size: 20px;
@@ -28,7 +31,6 @@
 @search-height: 450px;
 
 @io-size: 24px;
-
 
 .my-panel {
 
@@ -50,6 +52,10 @@
 	width: @logo-size;
 }
 
+.p-e {
+	padding-top: @padding-top; 
+}
+
 .p-l {
 	margin-left: @padding-left;
 }
@@ -60,6 +66,14 @@
 
 .p-t {
 	margin-top: @padding-top;
+}
+
+.p-r {
+	margin-right: @padding-right;
+}
+
+.f-r {
+	text-align: right;
 }
 
 p.title {
@@ -111,6 +125,16 @@ div.cities-box {
     .opacity(0.8);
 }
 
+div.selected-city-box {
+	text-align: center;
+	height: 300px;
+	background-color: @almost-white;
+	width: 70%;
+    margin: 0 auto;
+    .border-radius(10px, 10px, 10px, 10px);
+    .opacity(0.8);
+}
+
 span.io {
 	font-family: Quicksand;
 	color: @almost-white;
@@ -118,7 +142,7 @@ span.io {
 	font-style: italic;
 }
 
-p.city {
+span.city {
 	font-family: Quicksand;
 	color: @my-dark-blue;
 	font-size: @city-size;
@@ -129,6 +153,36 @@ p.city {
 	&:hover {
 		font-size: @city-size-2;
 	}
+}
+
+span.selected-city {
+	font-family: Quicksand;
+	color: @my-dark-blue;
+	font-size: @selected-city-size;
+	font-style: bold;
+	cursor: default;
+	text-align: center;
+	line-height: 1.0;
+	
+}
+
+span.selected-city-close {
+	&:extend(span.selected-city);
+	font-size: @city-size;
+}
+
+span.selected-city-credits {
+	&:extend(span.selected-city);
+	font-size: @city-size-small;
+	font-style: italic;
+}
+
+img.cityPhoto {
+	max-height: 220px;
+	max-width: 100%;
+	margin-left: 30px;
+	.border-radius(10px, 10px, 10px, 10px);
+    
 }
 
 .container { 

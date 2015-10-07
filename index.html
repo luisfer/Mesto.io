@@ -59,17 +59,37 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="my-search" ng-controller="CitiesController">
+            <div class="my-search" ng-controller="CitiesController" ng-init="init()">
                 <p class="search-text">I want to go to</p>
-                <div class="cities-box"  ng-init="init()">
+                <div class="cities-box p-t p-e"  ng-show="citySelected == 0">
                     <div class="row">
-                        <div class="col-md-3 p-t p-sl" >
-                            <div ng-repeat="city in cities">
-                            <p class="city" ng-click="selectCity(city)">{{city.get("Name")}}</p>
-                        </div>
+                    <div class="col-md-3" ng-repeat-start="city in cities" class="row city"><span class="city p-t" ng-click="selectCity(city)"> {{city.get("Name")}}</span></div>
+                    <div class="clearfix" ng-if="$index%4==3"></div>
+                    <div ng-repeat-end=""></div>
+                    </div>
+
+                       
+                </div>
+                <div class="selected-city-box p-t p-e" ng-show="citySelected > 0">
+                    <div class="row">
+                    
+                    <div class="f-r p-r">
+                    <span class="selected-city-close" ng-click="unselectCity()">BACK&nbsp;&nbsp;</span>
+                    </div>
+                    
+                    </div>
+                    <div class="row">
+                    <div class="col-md-6">
+                    <img src="{{selectedCityPhoto}}" class="cityPhoto">
+                    </div>
+                    <div class="col-md-6 p-t">
+                    <span class="p-t selected-city" ng-click="selectCity(city)"> {{selectedCity.get("Name")}}</span>
+                    <p></p>
+                     <span class="selected-city-credits" ng-click="unselectCity()">Photo<br> {{selectedCityPhotoAuthor}}</span>
+                    </div>
                     </div>
                 </div>
-            </div>
+               
                 <p class="go-button" ng-click="doSearch()">Find me a bed</p>
         </div>
         <div id="viewer"></div>
@@ -77,3 +97,8 @@
 </body>
 
 </html>
+
+ <div class="col-md-3"><span class="city p-t" ng-click="selectCity(city)"> {{cities[$index].get("Name")}}</span></div>
+                        <div class="col-md-3"><span class="city p-t" ng-click="selectCity(city)"> {{cities[$index+1].get("Name")}}</span></div>
+                        <div class="col-md-3"><span class="city" ng-click="selectCity(city)"> {{cities[$index+2].get("Name")}}</span></div>
+                        <div class="col-md-3"><span class="city" ng-click="selectCity(city)"> {{cities[$index+3].get("Name")}}</span></div>

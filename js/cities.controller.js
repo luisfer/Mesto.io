@@ -1,26 +1,49 @@
 // cities.controller.js
-app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q, $http) {
-
+app.controller('CitiesController', ['$scope', '$q', '$http', 'FlickrUrl', 'AirbnbUrl', 'Pages', 'DateFormatter', 'NextIndex', 'NumberRentals', '$timeout', 'AirbnbListing', function($scope, $q, $http, FlickrUrl, AirbnbUrl, Pages, DateFormatter, NextIndex, NumberRentals, $timeout, AirbnbListing) {
 
     // Variables
-    $scope.cities = [];
-    $scope.selectedCity = {};
-    $scope.selectedCityPhoto = {};
-    
-    $scope.citySelected = 0;
-    $scope.listingIndex = -1;
-    $scope.listingDivString = '<div class="col-sm-12 row-space-2 col-md-6">';
 
-    $scope.unformattedListings = [];
-    $scope.listings = [];
+    $scope.clearAllVariables = function() {
 
-    $scope.pages = 0;
+        $scope.cities = [];
+        $scope.selectedCity = {};
+        $scope.selectedCityPhoto = {};
+        $scope.selectedCityPhotoAuthor = {};
 
-    $scope.myParameters = {};
+
+        $scope.citySelected = 0;
+        $scope.listingIndex = -1;
+        $scope.listingDivString = '<div class="col-sm-12 row-space-2 col-md-6">';
+        
+        $scope.unformattedListings = [];
+        $scope.listings = [];
+
+        $scope.pages = 0;
+
+        $scope.currentStep = 1;
+
+        $scope.myParameters = {};
+
+        $scope.airbnbResponse = "";
+        $scope.airbnbRawListings = [];
+        $scope.airbnbUnparsedListings = [];
+        $scope.airbnbParsedListings = [];
+
+        $scope.listingsProcessed = false;
+    }
+
+
+    $scope.isStep = function(i){
+        if ($scope.currentStep == parseInt(i)){
+            return true;
+        }
+        return false;
+    }
 
     // Init
     $scope.init = function() {
 
+        $scope.clearAllVariables();
         $scope.getCities().then(function() {
             console.log("Cities loaded");
         });
@@ -45,19 +68,18 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
 
                     $scope.cities.push(results[i]);
                 }
-                $scope.cities.sort(function(a,b){
+                $scope.cities.sort(function(a, b) {
                     var textA = a.get("Name");
                     var textB = b.get("Name");
                     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
                 });
-                console.log("Hello?");
                 $scope.$apply();
                 deferred.resolve();
                 return deferred.promise;
 
             },
             error: function(error) {
-              return deferred.reject();
+                return deferred.reject();
             }
         });
 
@@ -65,25 +87,24 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
         return deferred.promise;
     }
 
+    $scope.viewDashboard = function(){
+        document.getElementById('iframe-container').innerHTML = '';
+        $scope.currentStep = 3;
+    }
+
     // City selected listener
 
     $scope.selectCity = function(city) {
         $scope.selectedCity = city;
-        console.log(city.get("ImageUrl"));
-        if (city.get("ImageUrl") == undefined){
-            $scope.callFlickrApi($scope.selectedCity.get("Name")).then(function() {
-               $scope.citySelected = 1;
-            });
-        } else {
-            $scope.selectedCityPhoto = city.get("ImageUrl");
-            console.log($scope.selectedCityPhotoAuthor);
-            $scope.selectedCityPhotoAuthor = city.get("ImageAuthor");
+        if (city.get("ImageUrl") == undefined) {
             $scope.citySelected = 1;
-        }
-        console.log($scope.selectedCity.get("Name"));
+            $scope.callFlickrApi($scope.selectedCity.get("Name")).then(function() {
+                
+            });
+        } 
     }
 
-    $scope.unselectCity = function(){
+    $scope.unselectCity = function() {
         $scope.citySelected = 0;
         $scope.selectedCity = {};
         $scope.selectedCityPhoto = "";
@@ -91,40 +112,26 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
 
     }
 
-    $scope.callFlickrApi = function(city){
+    $scope.callFlickrApi = function(city) {
 
         var deferred = $q.defer();
 
-        var segment1 = "https://api.flickr.com/services/rest/?method=flickr.photos.search";
-        var segment2 = "&api_key=";
-        var apikey = "f90b4426c5fe479e6f26403b6f3780fc"
-        var segment3 = "&tags=";
-        var segment4 = "%2C+city%2C+view&tag_mode=all&sort=+relevance&format=json&nojsoncallback=1";
+        var callUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=9f7ed4ef9068e928902bb975a6b49e67&tags=" + city + "%2C+city&tag_mode=all&sort=relevance&format=json&nojsoncallback=1";
 
-        var callUrl = segment1 + segment2 + apikey + segment3 + city + segment4;
+        console.log(callUrl);
         $http.get(callUrl).
-              success(function(data, status, headers, config) {
-                $scope.selectedCityPhoto = $scope.buildFlickrUrl(data);
-                deferred.resolve();
-                return deferred.promise;
-              }).
-              error(function(data, status, headers, config) {
-                return deferred.reject();
-              });
+        success(function(data, status, headers, config) {
+            var myphoto = FlickrUrl.build(data);
+            $scope.selectedCityPhoto = myphoto.photo;
+            $scope.selectedCityPhotoAuthor = myphoto.author;
+            deferred.resolve();
+            return deferred.promise;
+        }).
+        error(function(data, status, headers, config) {
+            return deferred.reject();
+        });
         deferred.notify();
         return deferred.promise;
-    }
-
-    $scope.buildFlickrUrl = function(data){
-        console.log(data.photos);
-        var id = data.photos.photo[0].id;
-        var farm = data.photos.photo[0].farm;
-        var server = data.photos.photo[0].server;
-        var secret = data.photos.photo[0].secret;
-        $scope.selectedCityPhotoAuthor = "https://www.flickr.com/photos/" + data.photos.photo[0].owner + "/" + data.photos.photo[0].id + "/";
-        var photoUrl = "http://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + ".jpg";
-        console.log(photoUrl);
-        return photoUrl;
     }
 
     $scope.parameters = function(day1, day2, cityName, pageNumber) {
@@ -134,7 +141,7 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
         this.pageNumber = pageNumber;
     }
 
-    $scope.doSearch = function(init) {
+    $scope.findMeABed = function() {
 
         var day1 = new moment();
         day1.add(1, 'days');
@@ -144,34 +151,62 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
 
         $scope.myParameters = new $scope.parameters(day1, day2, $scope.selectedCity.get("Name"), 1);
 
-        $scope.connectToAirbnb(init, $scope.myParameters);
+        $scope.processAirbnbRentals($scope.myParameters);
 
     }
 
-    $scope.connectToAirbnb = function(init, myParameters) {
-        var myUrl = $scope.giveUrl($scope.myParameters);
-        console.log(myUrl);
+    $scope.processAirbnbRentals = function(){
+        $scope.prepareIframe();
+        $scope.myParameters.pageNumber = 1;
+        $scope.connectToAirbnb($scope.myParameters).then(function(){
+            var mynumber = Pages.calculate($scope.airbnbResponse, $scope.pages);
+            $scope.pages = mynumber.pages;
+            $scope.rentals = mynumber.rentals;
+            
+            $timeout($scope.processListings().then(function(){
+                $scope.parseListings().then(function(){
+                    $scope.listingsProcessed = true;
+                });
+            }), 1000);
+        })
 
+    }
+
+    $scope.prepareIframe = function(){
+        $scope.currentStep = 2;
+        var iframeHtml = '<iframe class="p-t youtube" width="560" height="315" src="https://www.youtube.com/embed/8C5pONjuYAI" frameborder="0" allowfullscreen></iframe>';
+        document.getElementById('iframe-container').innerHTML = iframeHtml;
+    }
+
+    $scope.connectToAirbnb = function(myParameters) {
+
+        var deferred = $q.defer();
+
+        var myUrl = AirbnbUrl.build($scope.myParameters);
+        
         $.ajaxPrefilter(function(options) {
             if (options.crossDomain && jQuery.support.cors) {
                 var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-                //options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
-                //options.url = "http://cors.corsproxy.io/url=" + options.url;
-                options.url = http + '//allow-any-origin.appspot.com/' + options.url;
+                options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+                //options.url = http + '//allow-any-origin.appspot.com/' + options.url;
+                //options.url = http + '//test-cors.appspot.com/';
             }
-            console.log(options.url);
         });
 
         $.get(
             myUrl,
             function(response) {
-                console.log("Parsing page:" + $scope.myParameters.pageNumber + "/" + $scope.pages);
-                $scope.parseAirbnbCode(response);
+                $scope.airbnbResponse = response;
+                deferred.resolve();
+                return deferred.promise;
             });
+        deferred.notify();
+        return deferred.promise;
+
     }
 
     $scope.parseAirbnbCode = function(doc, $q) {
-        $scope.processPages(doc);
+        $scope.pages = Pages(doc, $scope.pages);
         $scope.parseListings(doc);
 
         if ($scope.pages > 1) {
@@ -183,87 +218,91 @@ app.controller('CitiesController', ['$scope', '$q', '$http', function($scope, $q
         }
     }
 
-    $scope.processListings = function(doc) {
+    $scope.processListings = function(deferred) {
+
+        if(!deferred){
+        deferred = $q.defer();
+        }
+
+        $scope.connectToAirbnb($scope.myParameters).then(function(){
+        console.log("Processing page: " + $scope.myParameters.pageNumber);
+            if ($scope.myParameters.pageNumber <= $scope.pages){
+                    $scope.airbnbRawListings.push($scope.airbnbResponse);
+                    $scope.myParameters.pageNumber++;
+                    $timeout($scope.processListings(deferred), 1000);
+            } else {
+                    console.log("Done");
+                    deferred.resolve();
+                    return deferred.promise;
+            }
+        });
+        
+        deferred.notify();
+        return deferred.promise;
 
     }
 
-    $scope.processPages = function(doc) {
-        if ($scope.pages == 0) {
-            var rentals = $scope.parseNumberRentals(doc);
-            if (rentals == '300+') {
-                $scope.pages = 5;
-            } else {
-                var a = parseInt(rentals);
-                $scope.pages = Math.floor(a / 18);
-                if ($scope.pages > 5) {
-                    $scope.pages = 5;
+    $scope.parseListings = function() {
+
+        var deferred = $q.defer();
+
+        for(var j=0;j<$scope.airbnbRawListings.length;j++){
+            var doc = $scope.airbnbRawListings[j];
+            var myindex = 0;
+            var i = 1;
+            var rest = NumberRentals.calculateRest($scope.rentals);
+            var newelement = "";
+            $scope.listingIndex = doc.indexOf('<div class="listings-container">');
+            var a = null;
+            while (i <= rest) {
+                if (i == 1) {
+                    a = AirbnbUrl.buildParserObject($scope.listingIndex, $scope.listingDivString, $scope.listingDivString);
+                    
+                } else if (i > 1 && i < rest) {
+                    a = AirbnbUrl.buildParserObject(myindex, $scope.listingDivString, $scope.listingDivString);
+                    
+                } else if (i == rest) {
+                    a = AirbnbUrl.buildParserObject(myindex, $scope.listingDivString, "Vacation Rentals");
+                    
+                }
+                newelement = AirbnbUrl.getHTMLBlock(doc, a);
+                myindex = myindex + newelement.length;
+                $scope.airbnbUnparsedListings.push(newelement);
+                i++;
+            }
+        }
+        
+        for(var j=0;j<$scope.airbnbUnparsedListings.length;j++){
+            
+            var a = $scope.airbnbUnparsedListings[j];
+
+            var b = AirbnbListing.build(a);
+            if (!$scope.isInListings(b.hosting)){
+                if (b.name.length > 1){
+                    $scope.airbnbParsedListings.push(b);
+                    console.log(b.name, b.url);
                 }
             }
-        }
-    }
-
-    $scope.parseNumberRentals = function(doc) {
-        var resultsString = 'data-behavior="results_count_text">';
-        var a = doc.indexOf(resultsString);
-        var b = a + resultsString.length;
-        var index0 = $scope.giveNextIndex(a, doc, ' Rentals');
-        var diff = index0 - b;
-        var rentals = doc.substr(b, diff);
-        return rentals;
-    }
-
-    $scope.parseListings = function(doc, $q) {
-
-        $scope.listingIndex = doc.indexOf('<div class="listings-container">');
-        var myindex = 0;
-        var i = 0;
-        while (i < 18) {
-            if (i == 0) {
-                myindex = $scope.addListing($scope.listingIndex, $scope.listingDivString, doc);
-            } else if (i > 0 && i < 17) {
-                myindex = $scope.addListing(myindex, $scope.listingDivString, doc);
-            } else if (i == 17) {
-                myindex = $scope.addListing(myindex, "Vacation Rentals", doc);
+            
+            if (j == ($scope.airbnbUnparsedListings.length - 1)){
+                console.log($scope.airbnbParsedListings.length);
+                deferred.resolve();
+                return deferred.promise;
             }
-            i++;
         }
 
     }
 
-    $scope.addListing = function(a, b, doc) {
-
-        var index0 = $scope.giveNextIndex(a, doc, $scope.listingDivString);
-        var index1 = index0 + $scope.listingDivString.length;
-        var index2 = $scope.giveNextIndex(index1, doc, b);
-        var diff = index2 - index1;
-        $scope.unformattedListings.push(doc.substr(index1, diff));
-        return index2;
+    $scope.isInListings = function(obj) {
+        for (var i = 0; i < $scope.airbnbParsedListings.length; i++) {
+            if ($scope.airbnbParsedListings[i].hosting === obj) {
+                return true;
+            }
+        }
+        return false;
     }
-
-    $scope.giveNextIndex = function(preIndex, preString, searchString) {
-        var searchIndex = preIndex + preString.substring(preIndex).indexOf(searchString);
-        return searchIndex;
-    }
+    
 
     // https://www.airbnb.com/s/London?checkin=10%2F25%2F2015&checkout=02%2F29%2F2016
-    $scope.giveUrl = function(p) {
-
-        var checkindate = $scope.formatDate(p.day1);
-        var checkoutdate = $scope.formatDate(p.day2);
-        myUrl = 'https://www.airbnb.com/s/' + p.cityName + '?checkin=' + checkindate + '&checkout=' + checkoutdate + '&page=' + p.pageNumber;
-        return myUrl;
-    }
-
-    $scope.formatDate = function(date) {
-        var formatDate1 = moment(date).format('L');
-        console.log(formatDate1);
-        var month = formatDate1.substr(0, 2);
-        var day = formatDate1.substr(3, 2);
-        var year = formatDate1.substr(6, 4);
-        var formatDate2 = month + '%2F' + day + '%2F' + year;
-        return formatDate2;
-    }
-
-    
 
 }]);

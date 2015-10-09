@@ -15,20 +15,24 @@
 @padding-left-small: 20px;
 @padding-top: 20px;
 @padding-right: 20px;
+@extra-padding-top: 100px;
 
 @logo-size: 50px;
+@back-size: 30px;
 
 @city-size: 18px;
 @city-size-2: 24px;
-@city-size-small: 13px;
-@selected-city-size: 48px;
+@city-size-small: 10px;
+@selected-city-size: 20px;
 
 @title-size: 40px;
 @motto-size: 20px;
+@iwanttogo-size: 38px;
 @search-size: 50px;
+@search-size-2: 54px;
 
 @panel-height: 65px;
-@search-height: 450px;
+@search-height: 500px;
 
 @io-size: 24px;
 
@@ -50,6 +54,14 @@
 
 .logo {
 	width: @logo-size;
+}
+
+.back {
+	width: @back-size;
+}
+
+.e-p-t {
+	margin-top: @extra-padding-top;
 }
 
 .p-e {
@@ -89,20 +101,36 @@ p.motto {
 	font-size: @motto-size;
 }
 
-p.search-text {
+span.search-text {
+	font-family: Quicksand;
+	color: @almost-white;
+	font-size: @iwanttogo-size;
+	text-align: center;
+}
+
+span.search-text-blue {
+	&:extend(span.search-text);
+	color: @my-dark-blue;
+}
+
+span.go-button {
 	font-family: Quicksand;
 	color: @almost-white;
 	font-size: @search-size;
-	text-align: center;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+	cursor: pointer;
+	&:hover {
+		text-decoration: underline;
+	}
 
 }
 
-p.go-button {
-	font-family: Quicksand;
-	color: @almost-white;
-	font-size: @search-size;
-	text-align: center;
-
+span.go-button-blue {
+	&:extend(span.go-button);
+	color: @my-dark-blue;
 }
 
 a.title {
@@ -117,7 +145,7 @@ a.title {
 
 div.cities-box {
 	text-align: center;
-	height: 300px;
+	height: 400px;
 	background-color: @almost-white;
 	width: 70%;
     margin: 0 auto;
@@ -126,8 +154,7 @@ div.cities-box {
 }
 
 div.selected-city-box {
-	text-align: center;
-	height: 300px;
+	height: 400px;
 	background-color: @almost-white;
 	width: 70%;
     margin: 0 auto;
@@ -149,10 +176,15 @@ span.city {
 	font-style: bold;
 	cursor: default;
 	text-align: center;
-	line-height: 1.0;
+	line-height: 1.5;
 	&:hover {
-		font-size: @city-size-2;
+		text-decoration: underline;
 	}
+}
+
+div.city-card {
+	margin-top: 0px;
+	text-align: center;
 }
 
 span.selected-city {
@@ -161,60 +193,47 @@ span.selected-city {
 	font-size: @selected-city-size;
 	font-style: bold;
 	cursor: default;
-	text-align: center;
 	line-height: 1.0;
+	font-style: italic;
 	
 }
 
 span.selected-city-close {
 	&:extend(span.selected-city);
 	font-size: @city-size;
+	text-align: left;
+	height: 40px;
 }
 
 span.selected-city-credits {
 	&:extend(span.selected-city);
 	font-size: @city-size-small;
 	font-style: italic;
+	min-height: 20px;
 }
 
-img.cityPhoto {
-	max-height: 220px;
-	max-width: 100%;
-	margin-left: 30px;
-	.border-radius(10px, 10px, 10px, 10px);
+div.cityPhoto {
+	.border-radius(10px, 10px, 10px, 10px);  
+	height: 400px;
+	width: 100%;
+    background-position: center center;
+    background-size: cover;
     
 }
 
-.container { 
-  width: 200px;
-  height: 260px;
-  position: relative;
-  perspective: 800px;
+div.overlay-photo {
+	height: 100%;
+	text-align: center;
+	margin: auto 0;
+	background-color:rgba(0, 0, 0, 0.4);
+	.border-radius(10px, 10px, 10px, 10px);
 }
 
-#card {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  transform-style: preserve-3d;
-  transition: transform 1s;
+div.youtube {
+	margin: auto 0;
+	text-align: center;
 }
 
-#card figure {
-  margin: 0;
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
-
-#card .front {
-}
-#card .back {
-  transform: rotateY( 180deg );
-}
-
-#card.flipped {
-  transform: rotateY( 180deg );
+.p-iframe {
+	margin-top: 250px;
 }

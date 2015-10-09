@@ -20,8 +20,11 @@
     <script src="js/utils.js"></script>
 
     <script src="js/app.module.js"></script>
+    <script src="js/app.factories.js"></script>
+    <script src="js/app.services.js"></script>
     <script src="js/cities.controller.js"></script>
     
+
     <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
 
@@ -43,62 +46,60 @@
 </head>
 
 <body ng-app="app">
-
+<div ng-controller="CitiesController" ng-init="init()">
+    <div>
     <div class="my-panel">
         <div class="row">
             <div class="col-md-1 p-t p-l">
                 <img src="i/france1.png" class="logo">
             </div>
             <div class="col-md-4 p-t">
-                <p class="title"><a class="title" href="www.mesto.io">MESTO</a><span class="io">.io</span>
+                <p class="title"><a class="title" href="http://www.mesto.io">MESTO</a><span class="io">.io</span>
                 </p>
                 <p class="motto">Find your bed <i>wisely</i>
                 </p>
             </div>
+            <div class="col-md-6 p-t f-r">
+                <img src="i/info44.png" class="logo">
+            </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" ng-show="isStep(1) == true">
         <div class="col-md-12">
-            <div class="my-search" ng-controller="CitiesController" ng-init="init()">
-                <p class="search-text">I want to go to</p>
-                <div class="cities-box p-t p-e"  ng-show="citySelected == 0">
+            <div class="my-search">
+                <div style="text-align:center;">
+                <span ng-show="citySelected == 0" class="search-text">I want to go to</span>
+                <span ng-show="citySelected > 0" class="search-text">{{selectedCity.get("Name")}}</span><span ng-show="citySelected > 0" class="selected-city-close p-t" ng-click="unselectCity()">(change)</span>
+                </div>
+                <div class="cities-box p-t p-e" ng-show="citySelected == 0">
                     <div class="row">
                     <div class="col-md-3" ng-repeat-start="city in cities" class="row city"><span class="city p-t" ng-click="selectCity(city)"> {{city.get("Name")}}</span></div>
                     <div class="clearfix" ng-if="$index%4==3"></div>
                     <div ng-repeat-end=""></div>
-                    </div>
-
-                       
+                    </div>  
                 </div>
-                <div class="selected-city-box p-t p-e" ng-show="citySelected > 0">
-                    <div class="row">
-                    
-                    <div class="f-r p-r">
-                    <span class="selected-city-close" ng-click="unselectCity()">BACK&nbsp;&nbsp;</span>
-                    </div>
-                    
-                    </div>
-                    <div class="row">
-                    <div class="col-md-6">
-                    <img src="{{selectedCityPhoto}}" class="cityPhoto">
-                    </div>
-                    <div class="col-md-6 p-t">
-                    <span class="p-t selected-city" ng-click="selectCity(city)"> {{selectedCity.get("Name")}}</span>
-                    <p></p>
-                     <span class="selected-city-credits" ng-click="unselectCity()">Photo<br> {{selectedCityPhotoAuthor}}</span>
+                <div class="selected-city-box p-t" ng-show="citySelected > 0">
+                    <div class="cityPhoto" style="background-image: url('{{selectedCityPhoto}}');" title="Photo: {{selectedCityPhotoAuthor}}">
+                    <div class="overlay-photo"> 
+                    <span class="go-button" ng-click="findMeABed()">Find me a bed</span>
                     </div>
                     </div>
                 </div>
-               
-                <p class="go-button" ng-click="doSearch()">Find me a bed</p>
         </div>
-        <div id="viewer"></div>
+        </div>
     </div>
+    <div ng-show="isStep(2) == true" style="text-align:center;">
+        <p><span class="p-t search-text-blue">Here's a video of {{selectedCity.get("Name")}} while we are finding beds for you</span></p>
+        <p><div id="iframe-container" class="p-t youtube">
+        </div>
+        </p>
+        <p><span ng-click="viewDashboard()" class="p-iframe go-button-blue" ng-show="listingsProcessed == true">Go!</span></p>
+    </div>
+    <div ng-show="isStep(3) == true">
+        Done!
+    </div>
+    </div>
+</div>
 </body>
 
 </html>
-
- <div class="col-md-3"><span class="city p-t" ng-click="selectCity(city)"> {{cities[$index].get("Name")}}</span></div>
-                        <div class="col-md-3"><span class="city p-t" ng-click="selectCity(city)"> {{cities[$index+1].get("Name")}}</span></div>
-                        <div class="col-md-3"><span class="city" ng-click="selectCity(city)"> {{cities[$index+2].get("Name")}}</span></div>
-                        <div class="col-md-3"><span class="city" ng-click="selectCity(city)"> {{cities[$index+3].get("Name")}}</span></div>

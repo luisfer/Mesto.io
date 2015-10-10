@@ -46,6 +46,20 @@ app.service('AirbnbUrl', function(DateFormatter, NextIndex) {
         return myUrl;
         }
 
+        this.buildAdvanced = function(p, paux){
+        	var myString = "";
+        	var checkindate = DateFormatter.get(p.day1);
+        	var checkoutdate = DateFormatter.get(p.day2);
+        	myUrl = 'https://www.airbnb.com/s/' + p.cityName + '?checkin=' + checkindate + '&checkout=' + checkoutdate + '&page=' + p.pageNumber;
+        	if (paux.superhost)
+        		myUrl += "&superhost=true";
+        	if (paux.instantSearch)
+        		myUrl += "&ib=true";
+        	if (paux.max100Euros)
+        		myUrl += "&price_max=100";
+        	return myUrl;
+        }
+
         this.getHTMLBlock = function(doc, o){
 
         	var a = o.startIndex;
@@ -66,8 +80,7 @@ app.service('AirbnbUrl', function(DateFormatter, NextIndex) {
 	    	this.startToken = b;
 	    	this.endToken = c;
 	    	return this;
-	    }
-	    
+	    }    
 });
 
 app.service('AirbnbListing', function(AirbnbUrl) {
@@ -97,10 +110,9 @@ app.service('AirbnbListing', function(AirbnbUrl) {
 	        if (myListingReviews[0] == ""){
 	        	myListingReviewCount = 0;
 	        } else {
-	        	myListingReviews[0].split(" ");
-	        	myListingReviewCount = parseInt(myListingReviews[0][0]);
+	        	var b = myListingReviews[0].split(" ");
+	        	myListingReviewCount = parseInt(b[0]);
 	        }
-
 
 	        var listingPhoto = AirbnbUrl.buildParserObject(d, imgToken, 'data-name');         
 	        var myListingPhoto = AirbnbUrl.getHTMLBlock(a, listingPhoto).split('"');
@@ -116,11 +128,11 @@ app.service('AirbnbListing', function(AirbnbUrl) {
 	        var b = {
 	        	name: myListingName[0],
 	     		currency: myListingCurrency,
-	     		price: myListingPrice,
+	     		price: parseInt(myListingPrice),
 	        	reviews: myListingReviewCount,
 	        	photo: myListingPhoto[0],
 	        	hosting: myListingHosting[0],
-	        	rating: myListingRating[0],
+	        	rating: parseFloat(myListingRating[0]),
 	        	address: myListingAddress[0],
 	        	url: "http://www.airbnb.com/rooms/" + myListingHosting[0]
 	    	};
@@ -152,16 +164,21 @@ app.service('NumberRentals', function(NextIndex) {
 });
 
 app.service('Pages', function(NumberRentals) {
-   this.calculate = function(doc, pages){
+   this.calculate = function(doc, pages, deep){
+   if (deep > 0){
+   		var pagesByDefault = 17;
+   } else {
+   		var pagesByDefault = 5; 
+   }
    var rentals = NumberRentals.calculate(doc);
    var numberRentals = parseInt(rentals);
    if (pages == 0) {
             if (numberRentals == 300) {
-                pages = 8;
+                pages = pagesByDefault;
             } else {
                 pages = Math.floor(numberRentals / 18);
-                if (pages > 8) {
-                    pages = 8;
+                if (pages > pagesByDefault) {
+                    pages = pagesByDefault;
                 }
             }
    }
@@ -171,4 +188,34 @@ app.service('Pages', function(NumberRentals) {
    }
    return number;
    }
+});
+
+app.service('Compare', function(){
+	this.byPrice = function(a,b){
+		if (a.price < b.price)
+	    	return -1;
+	  	if (a.price > b.price)
+	    	return 1;
+	  	return 0;
+	}
+	this.byReviews = function(a,b){
+		if (a.reviews < b.reviews)
+	    	return 1;
+	  	if (a.reviews > b.reviews)
+	    	return -1;
+	  	return 0;
+	}
+	this.byRating = function(a,b){
+		if (a.rating < b.rating)
+	    	return 1;
+	  	if (a.rating > b.rating)
+	    	return -1;
+	  	if (a.rating == b.rating){
+	  		if (a.reviews < b.reviews)
+	    		return 1;
+	  		if (a.reviews > b.reviews)
+	    		return -1;
+	  		return 0;
+	  	}
+	}
 });

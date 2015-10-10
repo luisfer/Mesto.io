@@ -1,6 +1,7 @@
 
 @import "elements.less";
 
+
 @import url(https://fonts.googleapis.com/css?family=Quicksand:400,300);
 @import url(https://fonts.googleapis.com/css?family=Alegreya+Sans:400,400italic,500,500italic);
 
@@ -24,6 +25,9 @@
 @city-size-2: 24px;
 @city-size-small: 10px;
 @selected-city-size: 20px;
+
+@listing-size: 18px;
+@listing-size-small: 14px;
 
 @title-size: 40px;
 @motto-size: 20px;
@@ -66,6 +70,10 @@
 
 .p-e {
 	padding-top: @padding-top; 
+}
+
+.p-b {
+	padding-bottom: @padding-top;
 }
 
 .p-l {
@@ -154,12 +162,23 @@ div.cities-box {
 }
 
 div.selected-city-box {
-	height: 400px;
+	&:extend(div.cities-box);
+}
+
+div.listings-box {
+	text-align: center;
 	background-color: @almost-white;
 	width: 70%;
     margin: 0 auto;
     .border-radius(10px, 10px, 10px, 10px);
     .opacity(0.8);
+	background-color: @my-blue;
+	width: 90%;
+}
+
+div.filter-box {
+	&:extend(div.listings-box);
+	background-color: @my-light-blue;
 }
 
 span.io {
@@ -194,8 +213,7 @@ span.selected-city {
 	font-style: bold;
 	cursor: default;
 	line-height: 1.0;
-	font-style: italic;
-	
+	font-style: italic;	
 }
 
 span.selected-city-close {
@@ -236,4 +254,49 @@ div.youtube {
 
 .p-iframe {
 	margin-top: 250px;
+}
+
+img.listing-photo {
+	width: 80%;
+}
+
+span.listing {
+	&:extend(span.selected-city);
+	font-size: @listing-size;
+	font-style: normal;
+	color: @almost-white;
+}
+
+span.listing-small {
+	&:extend(span.selected-city);
+	font-size: @listing-size-small;
+	font-style: normal;
+	color: @almost-white;
+}
+
+span.sorting {
+	&:extend(span.selected-city);
+	font-size: @listing-size;
+	font-style: normal;
+	color: @my-dark-blue;
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+div.listingPhoto {
+	&:extend(div.cityPhoto);
+	height: 200px;
+    
+}
+
+.unformatted {
+	font-family: Quicksand;
+}
+
+span.show-filters {
+	cursor: pointer;
+	&:hover {
+		text-decoration: underline;
+	}
 }

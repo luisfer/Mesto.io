@@ -18,9 +18,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.0/angular-route.js"></script>
 
     <script src="js/utils.js"></script>
-
+   
     <script src="js/app.module.js"></script>
-    <script src="js/app.factories.js"></script>
+    <script src="js/app.directive.js"></script>
     <script src="js/app.services.js"></script>
     <script src="js/cities.controller.js"></script>
     
@@ -59,8 +59,13 @@
                 <p class="motto">Find your bed <i>wisely</i>
                 </p>
             </div>
-            <div class="col-md-6 p-t f-r">
-                <img src="i/info44.png" class="logo">
+            <div class="col-md-4 p-t">
+                <span ng-show="isStep(3) == true" class="search-text">{{selectedCity.get("Name")}}
+                </span>
+            </div>
+            <div class="col-md-2 p-t f-r">
+                <img ng-click="restart()" ng-show="isStep(3) == true" style="padding-right: 20px;" src="i/left222.png" class="logo">
+                <img src="i/info44.png" class="logo" ng-click="showInfo()">
             </div>
         </div>
     </div>
@@ -96,10 +101,114 @@
         <p><span ng-click="viewDashboard()" class="p-iframe go-button-blue" ng-show="listingsProcessed == true">Go!</span></p>
     </div>
     <div ng-show="isStep(3) == true">
-        Done!
+        <div class="row p-t p-b">
+        <div class="col-md-7">
+        <p style="margin-left:70px;margin-top:20px;">
+        <span class="unformatted">Sort by</span> <span class="sorting" ng-click="sortByPrice()">cheapest</span> | <span class="sorting" ng-click="sortByRating()">best rated</span> | <span class="sorting" ng-click="sortByReviews()">number of reviews</span>
+        </p>
+        </div>
+        <div class="col-md-5">
+            <span class="search-text-blue show-filters" ng-click="showFilters()">{{showFiltersText}} advanced search</span>
+        </div>
+        </div>
+        <div ng-show="showFiltersBoolean == true" class="unformatted row filter-box p-t p-e p-b">
+            <div class="col-md-6">
+               <input type="checkbox" id="cb1" ng-model="isSuperhost">
+               <label for="cb1">Is Superhost</label><br>  
+               <input type="checkbox" id="cb2" ng-model="isInstantSearch">
+               <label for="cb2">Is Instant Search</label><br> 
+               <input type="checkbox" id="cb3" ng-model="atLeast45Stars">
+               <label for="cb3">At least 4.5 stars</label><br>
+               <input type="checkbox" id="cb4" ng-model="Max100Euros">
+               <label for="cb4">Max price: 100 euros per night</label><br> 
+               <input type="checkbox" id="cb5" ng-model="deepSearch">
+               <label for="cb5">Deep search (takes longer)</label><br>
+            </div>
+            <div class="col-md-6">
+                <label for="bar">Check In</label>
+                <input id="bar" name="bar" type="date" ng-model="searchCheckIn" required />
+                <br>
+                <label for="bar2">Check Out</label>
+                <input id="bar2" ng-min="searchCheckIn" name="bar2" type="date" ng-model="searchCheckOut" required />
+                <p>
+                <span class="search-text-blue show-filters" ng-click="applySearch()">Apply</span>
+                </p>
+            </div>
+        </div>      
+        <div class="row listings-box p-t p-e p-b">
+                    <div class="col-md-4 city p-b" ng-repeat-start="listing in airbnbParsedListings">
+                        <a href="{{listing.url}}"><div class="listingPhoto" style="background-image: url('{{listing.photo}}');"></div></a><br>
+                        <span class="listing p-t">{{listing.name}}</span>
+                        <br><span class="listing-small p-t"><b>Price per night </b> | {{listing.price}} {{listing.currency}}</span>
+                        <br><span class="listing-small p-t"><b>Score </b> | {{listing.rating}} based on {{listing.reviews}} reviews</span>
+                    </div>
+                    <div class="clearfix" ng-if="$index%3==2"></div>
+                    <div ng-repeat-end=""></div>
+        </div>  
+        
     </div>
     </div>
 </div>
+
+<div class="modal fade bs-example-modal-sm" id="loadingModal" tabindex="-1"
+    role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span class="unformatted">
+                    Finding beds</span>
+                 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info
+                    progress-bar-striped active"
+                    style="width: 100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-sm" id="infoModal" tabindex="-1"
+    role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span class="unformatted">
+                    Info</span>
+                 </h4>
+            </div>
+            <div class="modal-body unformatted">
+                <p><h3>CREDITS</h3></p>
+                <p>Mesto.io was created by me, Luisfer Romero Calero, a nice software developer from Sevilla, Spain. <a href="http://www.luisfer.me">This</a> is my personal website if you want to know more about me. I am always open to contracts, so if you like what you see, send me a message to luisfer.romero.calero(at)gmail(dot)com</p>
+                <p>Little disclaimer:
+                <br>I do not own the icons, and they come from <a href="http://www.flaticon.com">flaticon</a>
+                <br>I took the photos from Flickr API, and the videos from Youtube, and obviously they belong to their uploaders.</p>
+                <p><h3>MOTIVATION</h3></p>
+                <p><a href="http://www.airbnb.com">Airbnb</a> doesn't have a public API (yet). It's the only complain I have about this wonderful service. I found my two last homes through Airbnb. I had the idea to 'build an unofficial API' for myself actually, since I started to look for my new dream apartment in London.
+                </p>
+                <p><h3>ABOUT MESTO.IO</h3></p>
+                <p><i>Mesto</i> means city in Slovenian. It sounded nice to me, and the domain name was free, so...
+                <br>Mesto.io is a little tool that sorts the apartment by price, rating and reviews, which is useful to find out which one would be perfect for you.
+                <br>I used AngularJS, LESS, MomentJS, Bootstrap and Parse.
+                </p>
+                <p><h3>OPEN SOURCE</h3></p>
+                <p>Mesto.io is an open source project, and it's published in my <a href="https://github.com/luisfer/Mesto.io">Github profile</a>.
+                </p>
+                <p><h3>CONTACT</h3></p>
+                <p>I set up an email account for Mesto.io. If you want to cheer me up, say hi to mestoapp(at)gmail(dot)com
+                </p>
+                <span class="search-text-blue show-filters" onclick="$('.modal').modal('hide');">OK</span> 
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 
 </html>
+

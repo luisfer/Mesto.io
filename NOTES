@@ -1,7 +1,0 @@
-NOTES
-
-
-<div class="col-md-3 p-t p-sl" >
-                            <div ng-repeat="city in cities">
-                            <p class="city" ng-click="selectCity(city)">{{city.get("Name")}}</p>
-                        </div>
